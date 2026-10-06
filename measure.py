@@ -2,7 +2,7 @@ import requests
 import time
 import statistics
 
-BASE_URL = "http://localhost:8000"
+BASE_URL = "http://127.0.0.1:8000"
 # Тестируем все три эндпоинта из контракта
 ENDPOINTS = [
     ("GET", "/api/books?page=1&size=20"),

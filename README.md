@@ -7,7 +7,7 @@
 
 ## Установка и запуск
 ```bash
-git clone <адрес репозитория>
+git clone https://github.com/Solusasguard/OKSP_Kersach.git
 cd library-service
 cp .env.example .env
 # Обязательно укажи в .env свой реальный пароль от БД перед следующими шагами!
