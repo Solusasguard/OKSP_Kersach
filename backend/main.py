@@ -1,4 +1,5 @@
 import os
+import time
 from datetime import date, timedelta
 from fastapi import FastAPI, Query, HTTPException
 import psycopg2
@@ -90,6 +91,11 @@ def create_checkout(copy_id: int, reader_id: int):
 @app.get("/api/summary")
 def get_summary():
     """Сводка по библиотеке: на руках, просрочено, популярные книги"""
+    start_total = time.perf_counter()
+    
+    # Запускаем таймер БД строго ДО подключения
+    start_db = time.perf_counter() 
+    
     conn = get_db_connection()
     cur = conn.cursor()
     try:
@@ -97,7 +103,7 @@ def get_summary():
         cur.execute("SELECT COUNT(*) as count FROM oleg_gusev.checkouts WHERE return_date IS NULL")
         on_hand = cur.fetchone()['count']
         
-        # Просроченные экземпляры
+        # Просроченные экземпляры (восстановленный блок)
         cur.execute("""
             SELECT COUNT(*) as count 
             FROM oleg_gusev.checkouts 
@@ -116,6 +122,20 @@ def get_summary():
             LIMIT 5
         """)
         popular_books = cur.fetchall()
+        
+        end_db = time.perf_counter()
+        
+        # Расчет времени
+        db_time = (end_db - start_db) * 1000
+        total_time = (time.perf_counter() - start_total) * 1000
+        app_time = total_time - db_time
+        
+        # Вывод в консоль сервера для скриншота
+        print("\n=== ПРОФИЛИРОВАНИЕ GET /api/summary ===")
+        print(f"Общее время выполнения:  {total_time:.2f} мс")
+        print(f"Время в PostgreSQL (БД): {db_time:.2f} мс")
+        print(f"Время в коде FastAPI:    {app_time:.2f} мс")
+        print("=========================================\n")
         
         return {
             "copies_on_hand": on_hand,
