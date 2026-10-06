@@ -6,14 +6,36 @@
 * Python 3.12 (или выше)
 
 ## Установка и запуск
-
 ```bash
-git clone https://github.com/Solusasguard/OKSP_Kersach.git
+git clone <адрес репозитория>
 cd library-service
 cp .env.example .env
-# Обязательно укажите в .env свой реальный пароль от БД перед следующими шагами!
+# Обязательно укажи в .env свой реальный пароль от БД перед следующими шагами!
 
 pip install -r requirements.txt
 psql -U postgres -d oleg_gusev -f database/schema.sql
 python database/fill_db.py --size small
 uvicorn backend.main:app --host 0.0.0.0 --port 8080
+```
+
+## Переменные окружения
+| Переменная | Назначение | Пример |
+|---|---|---|
+| DATABASE_URL | подключение к БД | postgresql://postgres:changeme@localhost:5432/oleg_gusev |
+| APP_PORT | порт сервиса | 8080 |
+
+## Проверка работоспособности
+Интерфейс открывается по адресу http://localhost:8080, учетная запись для проверки `demo / demo`. На главной странице виден список доступных книг с пагинацией.
+
+## Тесты
+```bash
+pytest tests/
+```
+
+## Программный интерфейс
+| Метод и путь | Параметры | Ответ | Ошибки |
+|---|---|---|---|
+| GET /api/books | page, size | {"items": [...], "total": N} | 401 |
+| GET /api/books/{id} | id | Детальная карточка книги и ее экземпляров | 401, 404 |
+| POST /api/checkouts | copy_id, reader_id | 201 и запись о выдаче | 401, 403, 404 |
+| GET /api/summary | - | Сводка: выдано на руки, просрочено, популярные книги | 401 |
