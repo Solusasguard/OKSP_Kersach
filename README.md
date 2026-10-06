@@ -3,13 +3,17 @@
 
 ## Требования
 * PostgreSQL 16
-* Python 3.12+ (или другой выбранный стек)
+* Python 3.12 (или выше)
 
 ## Установка и запуск
+
 ```bash
-git clone <адрес репозитория>
+git clone https://github.com/Solusasguard/OKSP_Kersach.git
 cd library-service
 cp .env.example .env
-# установи зависимости
-# накати схему БД и скрипт наполнения малым объемом
-# запусти сервер
+# Обязательно укажите в .env свой реальный пароль от БД перед следующими шагами!
+
+pip install -r requirements.txt
+psql -U postgres -d oleg_gusev -f database/schema.sql
+python database/fill_db.py --size small
+uvicorn backend.main:app --host 0.0.0.0 --port 8080
